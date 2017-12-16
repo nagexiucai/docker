@@ -1,6 +1,6 @@
 # VSCode配置Go调试 #
 
-## 安装完lukehoban的Go for Visual Studio Cod的之后 #
+## 安装完lukehoban的Go for Visual Studio Code的之后 ##
 ```
 go get -u -v github.com/nsf/gocode
 go get -u -v github.com/rogpeppe/godef
