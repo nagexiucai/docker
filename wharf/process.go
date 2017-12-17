@@ -17,21 +17,10 @@ const cgroupMemoryHierarchyMount = "/sys/fs/cgroup/memory"
 func main() {
 	fmt.Println("欢迎体验Wharf容器平台！")
 
-/*	fmt.Println("===== namespace =====")
-	cmd := exec.Command("sh")
-	cmd.SysProcAttr = &syscall.SysProcAttr{
-		Cloneflags:fullNS,
-	}
-	cmd.Stdin = os.Stdin
-	cmd.Stdout = os.Stdout
-	cmd.Stderr = os.Stderr
-*/
-
-	fmt.Println("====== cgroups ======")
 	if os.Args[0] == "/proc/self/exe" {
 		fmt.Println("===== container =====")
 		fmt.Println("current pid is", syscall.Getpid())
-		cmd := exec.Command("sh", "-c", `stress --vm-bytes 256m --vm-keep -m 1 --timeout 30`)
+		cmd := exec.Command("sh")
 		cmd.SysProcAttr = &syscall.SysProcAttr{}
 		cmd.Stdin = os.Stdin
 		cmd.Stdout = os.Stdout
@@ -41,13 +30,16 @@ func main() {
 			fmt.Println("failed to run command in container")
 			fmt.Println(err)
 			os.Exit(1)
+		} else {
+			fmt.Println("container exit")
+			os.Exit(0)
 		}
 	}
 
 	cmd := exec.Command("/proc/self/exe")
-	cmd.SysProcAttr = &syscall.SysProcAttr{
-		Cloneflags:fullNS,
-	}
+	fmt.Println("===== namespace =====")
+	cmd.SysProcAttr = &syscall.SysProcAttr{Cloneflags:fullNS}
+	//cmd.SysProcAttr.Credential = &syscall.Credential{Uid:uint32(1), Gid:uint32(1)}
 	cmd.Stdin = os.Stdin
 	cmd.Stdout = os.Stdout
 	cmd.Stderr = os.Stderr
@@ -57,6 +49,7 @@ func main() {
 		fmt.Println(err)
 		os.Exit(1)
 	} else {
+		fmt.Println("====== cgroups ======")
 		fmt.Println("the global pid of container process is", cmd.Process.Pid)
 		fmt.Println("在系统默认创建的、挂在了memory subsystem的hierarchy上创建cgroup")
 		memoryLimit := path.Join(cgroupMemoryHierarchyMount, "testmemorylimit")
@@ -68,11 +61,7 @@ func main() {
 	}
 	cmd.Process.Wait()
 
-	fmt.Println("======== git ========")
+	fmt.Println("======== blk ========")
+	fmt.Println("====== network ======")
 
-/*
-	if err := cmd.Run(); err != nil {
-		fmt.Println(err)
-	}
-*/
 }
